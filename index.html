@@ -1,0 +1,90 @@
+<!-- production -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+
+  加密配置:<br>
+  <input type="radio" name="colors" class="colors" value="加密" checked="checked">加密<br>
+  <input type="radio" name="colors" class="colors" value="不加密">不加密<br>
+  <input id="myPwd1" placeholder="请输入加密密码（若您选择了加密）" type="text" /></input><br>
+
+  图片加密:<br>
+  <input id="myText" placeholder="请输入暗水印" type="text" /></input>
+  <input class="fileInput" type="file" onchange="previewHandle(this,1)" /></input>
+  <br>
+  <br>
+  <br>
+  解密：<br>
+  <input id="myPwd2" placeholder="请输入解密密码（若您在生成图片时设置了密码）" type="text" /></input><br>
+  <input class="fileInput" type="file" onchange="previewHandle(this,0)" /></input>
+  <img id="preview-img" />
+  <p>图片展示区</p>
+  <div id="pic">
+  </div>
+</body>
+
+</html>
+
+<script src="./waterMarker.js">
+</script>
+<script>
+  let hasPwd = true // 默认需要加密
+  let water = new WaterMarker({ isSetPwd: true });
+  function getText(id = 'myText') {
+    return document.getElementById(id).value || ''
+  }
+  function getRadioValue() {
+    var radioList = document.getElementsByClassName('colors')
+    for (let i = 0; i < radioList.length; i++) {
+      let radio = radioList[i]
+      if (radio.checked) {
+        hasPwd = radio.value === '加密' ? true : false
+        break
+      }
+    }
+  }
+  function previewHandle(fileDOM, type) {
+    this.getRadioValue()
+    water.setIsSetPwd(hasPwd)
+    if (!this.getText() && type === 1) return alert('请先填写暗水印')
+    var file = fileDOM.files[0],
+      imageType = /^image\//,
+      reader = '';
+    // 文件是否为图片
+    if (!imageType.test(file.type)) return alert("请选择图片！")
+    // 判断是否支持FileReader    
+    if (window.FileReader) reader = new FileReader();
+    // IE9及以下不支持FileReader
+    else return alert("您的浏览器不支持图片预览功能，如需该功能请升级您的浏览器！");
+
+    // 读取完成    
+    reader.onload = function (event) {
+      if (type === 1) {
+        // 加密
+        water.encipherPic(event.target.result, getText(), getText('myPwd1'))
+      } else {
+        // 解密
+        water.decryptPic(event.target.result, getText('myPwd2'))
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+</script>
+
+<style>
+  input[type='text'] {
+    width: 280px;
+    height: 24px;
+    border: 1px solid #999;
+    border-radius: 5px;
+  }
+</style>
