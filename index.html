@@ -6,26 +6,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>图片加密</title>
 </head>
 
 <body>
+  <div class="work">
+    <div class="blcok1">
+      加密配置:<br>
+      <input type="radio" name="colors" class="colors" value="加密" checked="checked">加密<br>
+      <input type="radio" name="colors" class="colors" value="不加密">不加密<br>
+      <input id="myPwd1" placeholder="请输入加密密码（若您选择了加密）" type="text" /></input><br>
 
-  加密配置:<br>
-  <input type="radio" name="colors" class="colors" value="加密" checked="checked">加密<br>
-  <input type="radio" name="colors" class="colors" value="不加密">不加密<br>
-  <input id="myPwd1" placeholder="请输入加密密码（若您选择了加密）" type="text" /></input><br>
+      图片加密:<br>
+      <input id="myText" placeholder="请输入暗水印" type="text" /></input>
+      <input class="fileInput" type="file" onchange="previewHandle(this,1)" /></input>
+      <br>
+      <br>
+      <br>
+    </div>
 
-  图片加密:<br>
-  <input id="myText" placeholder="请输入暗水印" type="text" /></input>
-  <input class="fileInput" type="file" onchange="previewHandle(this,1)" /></input>
-  <br>
-  <br>
-  <br>
-  解密：<br>
-  <input id="myPwd2" placeholder="请输入解密密码（若您在生成图片时设置了密码）" type="text" /></input><br>
-  <input class="fileInput" type="file" onchange="previewHandle(this,0)" /></input>
-  <img id="preview-img" />
+    <div class="block2">
+      解密：<br>
+      <input id="myPwd2" placeholder="请输入解密密码（若您在生成图片时设置了密码）" type="text" /></input><br>
+      <input class="fileInput" type="file" onchange="previewHandle(this,0)" /></input>
+      <img id="preview-img" />
+    </div>
+  </div>
+
   <p>图片展示区</p>
   <div id="pic">
   </div>
@@ -81,6 +88,10 @@
 </script>
 
 <style>
+  .work {
+    display: flex;
+  }
+
   input[type='text'] {
     width: 280px;
     height: 24px;

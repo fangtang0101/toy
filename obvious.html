@@ -1,0 +1,167 @@
+<!-- 明水印的展示 -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>明水印的展示</title>
+</head>
+
+<body>
+
+  这个页面主要是水印展示
+  <div class="btn-cantainer">
+    <button onclick="creatwaterMarker()">通过css直接添加水印</button>
+    <button onclick="creatwaterMarkerByCanvas()">通过canvans添加水印</button>
+    <button onclick="creatWaterMarkerBySvg()">通过svg添加水印</button>
+    <button onclick="protectWaterMarker()">水印防删除</button>
+  </div>
+
+
+
+
+</body>
+
+</html>
+
+<script>
+  let ID_NAME = 'water-marker__container'
+  const TEXT = '版权所有,盗版必究'
+
+  // 如果有 就先清除
+  function celarWaterMarkerContainer(id = ID_NAME) {
+    let ele = document.getElementById(id)
+    if (ele) ele.parentNode.removeChild(ele)
+  }
+
+  function cssHealper(ele, property) {
+    for (let k in property) {
+      ele.style[k] = property[k]
+    }
+  }
+
+
+  function creatwaterMarker() {
+    let div = document.createElement('div')
+    cssHealper(div, {
+      position: 'fixed',
+      left: '0px',
+      right: '0px',
+      top: '0px',
+      bottom: '0px',
+      'pointer-events': 'none',
+    })
+    div.setAttribute("id", ID_NAME);
+    celarWaterMarkerContainer()
+    document.body.appendChild(div)
+    let w = 180, h = 100;
+    let { clientWidth, clientHeight } = document.documentElement || document.body;
+    let cloumns = Math.ceil(clientWidth / w), rows = Math.ceil(clientHeight / h);
+    for (let i = 0; i < cloumns; i++) {
+      for (let j = 0; j < rows; j++) {
+        let ele = document.createElement('div')
+        ele.innerHTML = TEXT
+        cssHealper(ele, {
+          left: `${i * w}px`,
+          top: `${j * h}px`,
+          width: w,
+          height: h,
+          opacity: '0.2',
+          position: 'absolute',
+          transform: 'rotate(-40deg)',
+          'pointer-events': 'none',
+          'user-selected': 'none'
+        })
+        div.appendChild(ele)
+      }
+    }
+  }
+
+  // 将canvans 变成 图片，当做 背景图片使用
+  function creatwaterMarkerByCanvas() {
+
+    let canvas = document.createElement('canvas')
+    let angle = -20;
+    canvas.width = 180
+    canvas.height = 100
+    let ctx = canvas.getContext('2d')
+    ctx.clearRect(0, 0, 180, 100)
+    ctx.fillStyle = '#000'
+    ctx.font = `16px`
+    ctx.globalAlpha = '0.1'
+    ctx.rotate(Math.PI / 180 * angle)
+    ctx.fillText(TEXT, 0, 50)
+    let url = canvas.toDataURL()
+
+
+    let div = document.createElement('div')
+    cssHealper(div, {
+      position: 'fixed',
+      left: '0px',
+      right: '0px',
+      top: '0px',
+      bottom: '0px',
+      'pointer-events': 'none',
+      'background-repect': 'repect'
+    })
+    div.setAttribute("id", ID_NAME);
+    div.style.backgroundImage = `url(${url})`
+    celarWaterMarkerContainer()
+    document.body.appendChild(div)
+  }
+  // 思路也是一样 将 svg 转变成 图片，作为背景图片
+  // 这个最不好调试，写错一个字母都不行，也不报错，因为是字符串模板，建议不要用 字符串模板
+  function creatWaterMarkerBySvg() {
+    const svgStr =
+      `<svg xmlns='http://www.w3.org/2000/svg' width='180px' height="100px">
+          <text x='0px' y='30px' dy='16px' text-anchor='start' stroke='#000' stroke-opacity='0.1' fill='none' transform='rotate(-20)' font-weight='100' font-size='16'>
+          ${TEXT}2222
+          </text>
+    </svg>`
+    let url = `data:image/svg+xml;base64,${window.btoa(unescape(encodeURIComponent(svgStr)))}`
+    let div = document.createElement('div')
+    cssHealper(div, {
+      position: 'fixed',
+      left: '0px',
+      right: '0px',
+      top: '0px',
+      bottom: '0px',
+      'pointer-events': 'none',
+      'background-repect': 'repect'
+    })
+    div.setAttribute("id", ID_NAME);
+    div.style.backgroundImage = `url(${url})`
+    celarWaterMarkerContainer()
+    document.body.appendChild(div)
+  }
+  //  防止删除
+  function protectWaterMarker() {
+    let div = document.getElementById(ID_NAME)
+    let config = { attributes: true, childList: true, subtree: true }
+    const callback = function (mutationList, observer) {
+      for (let i in mutationList) {
+        // 坑一：这个地方是数组
+        let mutation = mutationList[i]
+        // 坑二：必须用 for 不能用 forEach
+        for (let j = 0; j < mutation.removedNodes.length; j++) {
+          let item = mutation.removedNodes[j]
+          if (item === div) {
+            document.body.appendChild(div)
+          }
+        }
+      }
+    }
+    const targetNode = document.body
+    const observer = new MutationObserver(callback)
+    observer.observe(targetNode, config)
+  }
+</script>
+
+<style>
+  .btn-cantainer {
+    display: flex;
+    justify-content: space-around;
+  }
+</style>
