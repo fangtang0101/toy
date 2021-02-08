@@ -35,6 +35,7 @@
 
   <p>图片展示区</p>
   <div id="pic">
+    <!-- <button id="download">点击下载图片</button> -->
   </div>
 </body>
 
@@ -43,6 +44,46 @@
 <script src="./waterMarker.js">
 </script>
 <script>
+  initDownBtn()
+  function initDownBtn() {
+    // 设置下载并转换
+    const download = document.getElementById('download');
+    download.onclick = function () {
+      let canvas = document.getElementsByTagName('canvas')[0]
+      var bloburl = canvas.toDataURL();
+      console.log('bloburl', bloburl);
+      var anchor = document.createElement('a');
+      if ('download' in anchor) {
+        anchor.style.visibility = 'hidden';
+        anchor.href = bloburl;
+        anchor.download = name;
+        document.body.appendChild(anchor);
+        var evt = document.createEvent('MouseEvents');
+        evt.initEvent('click', true, true);
+        anchor.dispatchEvent(evt);
+        document.body.removeChild(anchor);
+      } else {
+        location.href = bloburl;
+      }
+    }
+  }
+
+
+  function toolAlert(msg) {
+    clearFileName()
+    alert(msg)
+  }
+  // 清除 file 选择的 filename
+  function clearFileName() {
+    let domList = document.getElementsByClassName('fileInput')
+    for (let i = 0; i < domList.length; i++) {
+      let dom = domList[i]
+      dom.value = '';
+    }
+  }
+
+
+
   let hasPwd = true // 默认需要加密
   let water = new WaterMarker({ isSetPwd: true });
   function getText(id = 'myText') {
@@ -61,16 +102,16 @@
   function previewHandle(fileDOM, type) {
     this.getRadioValue()
     water.setIsSetPwd(hasPwd)
-    if (!this.getText() && type === 1) return alert('请先填写暗水印')
+    if (!this.getText() && type === 1) return toolAlert('请先填写暗水印')
     var file = fileDOM.files[0],
       imageType = /^image\//,
       reader = '';
     // 文件是否为图片
-    if (!imageType.test(file.type)) return alert("请选择图片！")
+    if (!imageType.test(file.type)) return toolAlert("请选择图片！")
     // 判断是否支持FileReader    
     if (window.FileReader) reader = new FileReader();
     // IE9及以下不支持FileReader
-    else return alert("您的浏览器不支持图片预览功能，如需该功能请升级您的浏览器！");
+    else return toolAlert("您的浏览器不支持图片预览功能，如需该功能请升级您的浏览器！");
 
     // 读取完成    
     reader.onload = function (event) {
